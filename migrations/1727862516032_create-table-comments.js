@@ -9,11 +9,6 @@ exports.up = (pgm) => {
       type: 'TEXT',
       notNull: true,
     },
-    is_delete: {
-      type: 'BOOLEAN',
-      notNull: true,
-      default: false,
-    },
     date: {
       type: 'TIMESTAMP',
       notNull: true,
@@ -28,6 +23,11 @@ exports.up = (pgm) => {
       type: 'VARCHAR(50)',
       notNull: true,
       references: 'users',
+    },
+    is_delete: {
+      type: 'BOOLEAN',
+      notNull: true,
+      default: false,
     },
   });
 };
