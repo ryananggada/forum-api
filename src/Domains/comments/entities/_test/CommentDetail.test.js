@@ -6,6 +6,7 @@ describe('CommentDetail entities', () => {
       id: 'comment-123',
       date: '2022-09-09T09:15:30.338Z',
       content: 'Nice article!',
+      replies: [],
     };
 
     expect(() => new CommentDetail(payload)).toThrow(
@@ -19,6 +20,7 @@ describe('CommentDetail entities', () => {
       username: 'user-456',
       date: '2022-09-09T09:15:30.338Z',
       content: 123,
+      replies: [],
     };
 
     expect(() => new CommentDetail(payload)).toThrow(
@@ -32,13 +34,15 @@ describe('CommentDetail entities', () => {
       username: 'user-456',
       date: '2022-09-09T09:15:30.338Z',
       content: 'Nice article!',
+      replies: [],
     };
 
-    const { id, username, date, content } = new CommentDetail(payload);
+    const { id, username, date, content, replies } = new CommentDetail(payload);
 
     expect(id).toEqual(payload.id);
     expect(username).toEqual(payload.username);
     expect(date).toEqual(payload.date);
     expect(content).toEqual(payload.content);
+    expect(replies).toEqual(payload.replies);
   });
 });
