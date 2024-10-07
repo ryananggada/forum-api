@@ -19,15 +19,15 @@ exports.up = (pgm) => {
       notNull: true,
       references: 'users',
     },
-    created_at: {
-      type: 'TIMESTAMP',
-      notNull: true,
-      default: pgm.func('CURRENT_TIMESTAMP'),
-    },
     is_delete: {
       type: 'BOOLEAN',
       notNull: true,
       default: false,
+    },
+    created_at: {
+      type: 'TIMESTAMP',
+      notNull: true,
+      default: pgm.func('CURRENT_TIMESTAMP'),
     },
   });
 };

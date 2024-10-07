@@ -1,3 +1,5 @@
+const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
+const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const ReplyRepository = require('../../Domains/replies/ReplyRepository');
 const AddedReply = require('../../Domains/replies/entities/AddedReply');
 
@@ -50,17 +52,34 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     return result.rows;
   }
 
-  async deleteReplyById(id) {
+  async deleteReplyById(threadId, commentId, replyId) {
     const query = {
       text: `
         UPDATE replies
         SET is_delete = true
-        WHERE id = $1
+        WHERE thread_id = $1 AND comment_id = $2 AND id = $3
       `,
-      values: [id],
+      values: [threadId, commentId, replyId],
     };
 
-    await this._pool.query(query);
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('reply tidak ditemukan');
+    }
+  }
+
+  async verifyReplyOwner(replyId, userId) {
+    const query = {
+      text: `SELECT * FROM replies WHERE id = $1 AND user_id = $2`,
+      values: [replyId, userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new AuthorizationError('bukan pemilik reply');
+    }
   }
 }
 

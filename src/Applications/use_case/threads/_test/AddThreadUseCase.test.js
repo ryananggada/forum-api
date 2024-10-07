@@ -10,37 +10,41 @@ describe('AddThreadUseCase', () => {
       body: 'Recently the conversion rate of US dollar to Indonesian Rupiah rises by 5% in this period.',
     };
 
+    const mockUser = {
+      id: 'user-123',
+    };
+
     const mockAddedThread = new AddedThread({
       id: 'thread-456',
       title: useCasePayload.title,
-      owner: 'user-123',
+      owner: mockUser.id,
     });
 
     const mockThreadRepository = new ThreadRepository();
 
-    mockThreadRepository.addThread = jest.fn(() =>
-      Promise.resolve(mockAddedThread),
-    );
+    mockThreadRepository.addThread = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve(mockAddedThread));
 
     const addThreadUseCase = new AddThreadUseCase({
       threadRepository: mockThreadRepository,
     });
 
     const addedThread = await addThreadUseCase.execute(
-      'user-123',
+      mockUser.id,
       useCasePayload,
     );
 
     expect(addedThread).toStrictEqual(
       new AddedThread({
         id: 'thread-456',
-        owner: 'user-123',
+        owner: mockUser.id,
         title: useCasePayload.title,
       }),
     );
 
     expect(mockThreadRepository.addThread).toBeCalledWith(
-      'user-123',
+      mockUser.id,
       new NewThread({
         title: useCasePayload.title,
         body: useCasePayload.body,
