@@ -17,27 +17,31 @@ class ReplyRepositoryPostgres extends ReplyRepository {
       text: `
         INSERT INTO replies
         VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING id, content, owner
+        RETURNING id, content, user_id
       `,
       values: [id, content, date, commentId, userId, false],
     };
 
     const result = await this._pool.query(query);
-    return new AddedReply(result.rows[0]);
+    return new AddedReply({
+      id: result.rows[0].id,
+      content: result.rows[0].content,
+      owner: result.rows[0].user_id,
+    });
   }
 
   async getRepliesByCommentId(commentId) {
     const query = {
       text: `
-        SELECT replies.id, replies.date, users.username,
+        SELECT replies.id, replies.created_at, users.username,
         CASE
           WHEN replies.is_delete THEN '**balasan telah dihapus**'
           ELSE replies.content
-        ENDCASE AS content  
+        ENDCASE AS content
         FROM replies
-        INNER JOIN users ON users.id = replies.owner
-        WHERE replies.comment = $1
-        ORDER BY replies.date ASC
+        INNER JOIN users ON users.id = replies.user_id
+        WHERE replies.comment_id = $1
+        ORDER BY replies.created_at ASC
         `,
       values: [commentId],
     };

@@ -9,20 +9,20 @@ exports.up = (pgm) => {
       type: 'TEXT',
       notNull: true,
     },
-    date: {
-      type: 'TIMESTAMP',
-      notNull: true,
-      default: pgm.func('CURRENT_TIMESTAMP'),
-    },
-    thread: {
+    thread_id: {
       type: 'VARCHAR(50)',
       notNull: true,
       references: 'threads',
     },
-    owner: {
+    user_id: {
       type: 'VARCHAR(50)',
       notNull: true,
       references: 'users',
+    },
+    created_at: {
+      type: 'TIMESTAMP',
+      notNull: true,
+      default: pgm.func('CURRENT_TIMESTAMP'),
     },
     is_delete: {
       type: 'BOOLEAN',

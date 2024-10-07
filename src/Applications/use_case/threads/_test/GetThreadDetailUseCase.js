@@ -11,35 +11,6 @@ describe('GetThreadDetailUseCase', () => {
     const mockUserRepository = new UserRepository();
   });
 
-  /*
-  "id": "thread-AqVg2b9JyQXR6wSQ2TmH4",
-            "title": "sebuah thread",
-            "body": "sebuah body thread",
-            "date": "2021-08-08T07:59:16.198Z",
-            "username": "dicoding",
-            "comments": [
-                {
-                    "id": "comment-q_0uToswNf6i24RDYZJI3",
-                    "username": "dicoding",
-                    "date": "2021-08-08T07:59:18.982Z",
-                    "replies": [
-                        {
-                            "id": "reply-BErOXUSefjwWGW1Z10Ihk",
-                            "content": "**balasan telah dihapus**",
-                            "date": "2021-08-08T07:59:48.766Z",
-                            "username": "johndoe"
-                        },
-                        {
-                            "id": "reply-xNBtm9HPR-492AeiimpfN",
-                            "content": "sebuah balasan",
-                            "date": "2021-08-08T08:07:01.522Z",
-                            "username": "dicoding"
-                        }
-                    ],
-                    "content": "sebuah comment"
-                }
-  */
-
   const userA = {
     id: 'user-123',
     username: 'johncena',
@@ -57,35 +28,44 @@ describe('GetThreadDetailUseCase', () => {
     title: 'My thread',
     body: 'Thread content goes here.',
     date: '2024-10-04T10:24:47.551Z',
-    username: 'johncena',
+    user_id: 'user-123',
   };
-  /*
-  const mockCommentData = {
-    comments: [
-      {
-        id: "comment-q_0uToswNf6i24RDYZJI3",
-                    "username": "dicoding",
-                    "date": "2021-08-08T07:59:18.982Z",
-                    "replies": [
-                        {
-                            "id": "reply-BErOXUSefjwWGW1Z10Ihk",
-                            "content": "**balasan telah dihapus**",
-                            "date": "2021-08-08T07:59:48.766Z",
-                            "username": "johndoe"
-                        },
-                        {
-                            "id": "reply-xNBtm9HPR-492AeiimpfN",
-                            "content": "sebuah balasan",
-                            "date": "2021-08-08T08:07:01.522Z",
-                            "username": "dicoding"
-                        }
-                    ],
-                    "content": "sebuah comment"
-      },
-      {
 
-      }
-    ]
-  }
-    */
+  const mockCommentData = [
+    {
+      id: 'comment-123',
+      content: 'Test comment one',
+      user_id: 'user-456',
+      thread_id: 'thread-123',
+      created_at: '2024-10-07T01:58:38.808Z',
+      is_delete: false,
+    },
+    {
+      id: 'comment-625',
+      content: 'Test comment two',
+      user_id: 'user-123',
+      thread_id: 'thread-123',
+      created_at: '2024-10-07T02:54:10.771Z',
+      is_delete: false,
+    },
+  ];
+
+  const mockReplyData = [
+    {
+      id: 'reply-123',
+      content: 'Reply goes here',
+      comment_id: 'comment-123',
+      user_id: 'user-123',
+      is_delete: false,
+      created_at: '2024-10-07T02:54:38.565Z',
+    },
+    {
+      id: 'reply-207',
+      content: 'Reply goes here again',
+      comment_id: 'comment-123',
+      user_id: 'user-456',
+      is_delete: false,
+      created_at: '2024-10-07T02:55:46.810Z',
+    },
+  ];
 });

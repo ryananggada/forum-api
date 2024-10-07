@@ -17,27 +17,31 @@ class CommentRepositoryPostgres extends CommentRepository {
       text: `
         INSERT INTO comments
         VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING id, content, owner
+        RETURNING id, content, user_id
       `,
       values: [id, content, date, threadId, userId, false],
     };
 
     const result = await this._pool.query(query);
-    return new AddedComment({ ...result.rows[0] });
+    return new AddedComment({
+      id: result.rows[0].id,
+      content: result.rows[0].content,
+      owner: result.rows[0].user_id,
+    });
   }
 
   async getCommentsByThreadId(threadId) {
     const query = {
       text: `
-        SELECT comments.id, users.username, comments.date,
+        SELECT comments.id, users.username, comments.created_at,
         CASE
           WHEN comment.is_delete THEN '**komentar telah dihapus**'
           ELSE comments.content
         ENDCASE AS content 
         FROM comments
-        INNER JOIN users ON comments.owner = users.id
+        INNER JOIN users ON comments.user_id = users.id
         WHERE comments.thread = $1
-        ORDER BY comments.date ASC
+        ORDER BY comments.created_at ASC
       `,
       values: [threadId],
     };

@@ -9,17 +9,12 @@ exports.up = (pgm) => {
       type: 'TEXT',
       notNull: true,
     },
-    date: {
-      type: 'TIMESTAMP',
-      notNull: true,
-      default: pgm.func('CURRENT_TIMESTAMP'),
-    },
-    comment: {
+    comment_id: {
       type: 'VARCHAR(50)',
       notNull: true,
       references: 'comments',
     },
-    owner: {
+    user_id: {
       type: 'VARCHAR(50)',
       notNull: true,
       references: 'users',
@@ -28,6 +23,11 @@ exports.up = (pgm) => {
       type: 'BOOLEAN',
       notNull: true,
       default: false,
+    },
+    created_at: {
+      type: 'TIMESTAMP',
+      notNull: true,
+      default: pgm.func('CURRENT_TIMESTAMP'),
     },
   });
 };
