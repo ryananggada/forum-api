@@ -35,6 +35,91 @@ describe('/threads endpoint', () => {
       expect(responseJson.message).toEqual('Missing authentication');
     });
 
+    it('shoud response 400 when request payload not contain needed property', async () => {
+      const loginPayload = {
+        username: 'ryananggada',
+        password: 'secret123',
+      };
+
+      const requestPayload = {
+        title: 'The Missing Body',
+      };
+
+      const server = await createServer(container);
+
+      await server.inject({
+        method: 'POST',
+        url: '/users',
+        payload: {
+          username: loginPayload.username,
+          password: loginPayload.password,
+          fullname: 'Ryan Anggada',
+        },
+      });
+
+      const auth = await server.inject({
+        method: 'POST',
+        url: '/authentications',
+        payload: loginPayload,
+      });
+      const authResponse = JSON.parse(auth.payload);
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        payload: requestPayload,
+        headers: { Authorization: `Bearer ${authResponse.data.accessToken}` },
+      });
+
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(400);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual();
+    });
+
+    it('should response 400 when request payload has invalid property type', async () => {
+      const loginPayload = {
+        username: 'ryananggada',
+        password: 'secret123',
+      };
+
+      const requestPayload = {
+        title: 'Body with invalid type',
+        body: 12345,
+      };
+
+      const server = await createServer(container);
+
+      await server.inject({
+        method: 'POST',
+        url: '/users',
+        payload: {
+          username: loginPayload.username,
+          password: loginPayload.password,
+          fullname: 'Ryan Anggada',
+        },
+      });
+
+      const auth = await server.inject({
+        method: 'POST',
+        url: '/authentications',
+        payload: loginPayload,
+      });
+      const authResponse = JSON.parse(auth.payload);
+
+      const response = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        payload: requestPayload,
+        headers: { Authorization: `Bearer ${authResponse.data.accessToken}` },
+      });
+
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(400);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual();
+    });
+
     it('should response 201 and persisted thread', async () => {
       const loginPayload = {
         username: 'ryananggada',
@@ -77,15 +162,18 @@ describe('/threads endpoint', () => {
       expect(responseJson.status).toEqual('success');
       expect(responseJson.data.addedThread.title).toEqual(requestPayload.title);
     });
+  });
 
-    it('shoud response 400 when request payload not contain needed property', async () => {
+  describe('when GET /threads/{threadId}', () => {
+    it('it should return a thread with details', async () => {
       const loginPayload = {
         username: 'ryananggada',
         password: 'secret123',
       };
 
       const requestPayload = {
-        title: 'The Missing Body',
+        title: 'Title goes here',
+        body: 'My body goes here',
       };
 
       const server = await createServer(container);
@@ -107,17 +195,21 @@ describe('/threads endpoint', () => {
       });
       const authResponse = JSON.parse(auth.payload);
 
-      const response = await server.inject({
+      const postThread = await server.inject({
         method: 'POST',
         url: '/threads',
         payload: requestPayload,
         headers: { Authorization: `Bearer ${authResponse.data.accessToken}` },
       });
+      const postThreadResponse = JSON.parse(postThread.payload);
 
+      const response = await server.inject({
+        method: 'GET',
+        url: `/threads/${postThreadResponse.data.addedThread.id}`,
+      });
       const responseJson = JSON.parse(response.payload);
-      expect(response.statusCode).toEqual(400);
-      expect(responseJson.status).toEqual('fail');
-      expect(responseJson.message).toEqual();
+      expect(response.statusCode).toEqual(200);
+      console.log(responseJson);
     });
   });
 });

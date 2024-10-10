@@ -94,10 +94,10 @@ container.register([
     parameter: {
       dependencies: [
         {
-          concrete: 'pool',
+          concrete: pool,
         },
         {
-          concrete: 'nanoid',
+          concrete: nanoid,
         },
       ],
     },
@@ -108,10 +108,10 @@ container.register([
     parameter: {
       dependencies: [
         {
-          concrete: 'pool',
+          concrete: pool,
         },
         {
-          concrete: 'nanoid',
+          concrete: nanoid,
         },
       ],
     },
@@ -122,10 +122,10 @@ container.register([
     parameter: {
       dependencies: [
         {
-          concrete: 'pool',
+          concrete: pool,
         },
         {
-          concrete: 'nanoid',
+          concrete: nanoid,
         },
       ],
     },
