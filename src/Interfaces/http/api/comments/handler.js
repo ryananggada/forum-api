@@ -23,7 +23,7 @@ class CommentsHandler {
       request.payload,
     );
 
-    const response = h.respones({
+    const response = h.response({
       status: 'success',
       data: { addedComment },
     });

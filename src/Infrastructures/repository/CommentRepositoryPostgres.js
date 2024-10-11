@@ -21,7 +21,7 @@ class CommentRepositoryPostgres extends CommentRepository {
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id, content, user_id
       `,
-      values: [id, content, date, threadId, userId, false],
+      values: [id, content, threadId, userId, false, date],
     };
 
     const result = await this._pool.query(query);
@@ -37,12 +37,12 @@ class CommentRepositoryPostgres extends CommentRepository {
       text: `
         SELECT comments.id, users.username, comments.created_at,
         CASE
-          WHEN comment.is_delete THEN '**komentar telah dihapus**'
+          WHEN comments.is_delete THEN '**komentar telah dihapus**'
           ELSE comments.content
-        ENDCASE AS content 
+        END AS content
         FROM comments
         INNER JOIN users ON comments.user_id = users.id
-        WHERE comments.thread = $1
+        WHERE comments.thread_id = $1
         ORDER BY comments.created_at ASC
       `,
       values: [threadId],
@@ -55,7 +55,7 @@ class CommentRepositoryPostgres extends CommentRepository {
   async deleteCommentById(threadId, commentId) {
     const query = {
       text: `
-        UPDATE commments
+        UPDATE comments
         SET is_delete = true
         WHERE thread_id = $1 AND id = $2
       `,
@@ -78,7 +78,7 @@ class CommentRepositoryPostgres extends CommentRepository {
     const result = await this._pool.query(query);
 
     if (!result.rowCount) {
-      throw new AuthorizationError('bukan pemilik comment');
+      throw new AuthorizationError('unauthorized, not the owner of comment');
     }
   }
 }

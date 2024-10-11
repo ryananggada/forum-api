@@ -21,7 +21,7 @@ class ReplyRepositoryPostgres extends ReplyRepository {
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id, content, user_id
       `,
-      values: [id, content, date, commentId, userId, false],
+      values: [id, content, commentId, userId, false, date],
     };
 
     const result = await this._pool.query(query);
@@ -39,7 +39,7 @@ class ReplyRepositoryPostgres extends ReplyRepository {
         CASE
           WHEN replies.is_delete THEN '**balasan telah dihapus**'
           ELSE replies.content
-        ENDCASE AS content
+        END AS content
         FROM replies
         INNER JOIN users ON users.id = replies.user_id
         WHERE replies.comment_id = $1
@@ -52,14 +52,14 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     return result.rows;
   }
 
-  async deleteReplyById(threadId, commentId, replyId) {
+  async deleteReplyById(commentId, replyId) {
     const query = {
       text: `
         UPDATE replies
         SET is_delete = true
-        WHERE thread_id = $1 AND comment_id = $2 AND id = $3
+        WHERE  comment_id = $1 AND id = $2
       `,
-      values: [threadId, commentId, replyId],
+      values: [commentId, replyId],
     };
 
     const result = await this._pool.query(query);

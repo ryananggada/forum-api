@@ -35,7 +35,7 @@ describe('/threads endpoint', () => {
       expect(responseJson.message).toEqual('Missing authentication');
     });
 
-    it('shoud response 400 when request payload not contain needed property', async () => {
+    it('should response 400 when request payload not contain needed property', async () => {
       const loginPayload = {
         username: 'ryananggada',
         password: 'secret123',
@@ -74,7 +74,9 @@ describe('/threads endpoint', () => {
       const responseJson = JSON.parse(response.payload);
       expect(response.statusCode).toEqual(400);
       expect(responseJson.status).toEqual('fail');
-      expect(responseJson.message).toEqual();
+      expect(responseJson.message).toEqual(
+        'cannot create new thread due to missing required property in payload',
+      );
     });
 
     it('should response 400 when request payload has invalid property type', async () => {
@@ -117,7 +119,9 @@ describe('/threads endpoint', () => {
       const responseJson = JSON.parse(response.payload);
       expect(response.statusCode).toEqual(400);
       expect(responseJson.status).toEqual('fail');
-      expect(responseJson.message).toEqual();
+      expect(responseJson.message).toEqual(
+        'cannot create new thread due to invalid payload property type',
+      );
     });
 
     it('should response 201 and persisted thread', async () => {
@@ -165,6 +169,20 @@ describe('/threads endpoint', () => {
   });
 
   describe('when GET /threads/{threadId}', () => {
+    it('it should response 404 when thread is not found', async () => {
+      const server = await createServer(container);
+
+      const response = await server.inject({
+        method: 'GET',
+        url: '/threads/123',
+      });
+      const responseJson = JSON.parse(response.payload);
+
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('thread not found');
+    });
+
     it('it should return a thread with details', async () => {
       const loginPayload = {
         username: 'ryananggada',
@@ -208,8 +226,16 @@ describe('/threads endpoint', () => {
         url: `/threads/${postThreadResponse.data.addedThread.id}`,
       });
       const responseJson = JSON.parse(response.payload);
+
       expect(response.statusCode).toEqual(200);
-      console.log(responseJson);
+      expect(responseJson.status).toEqual('success');
+      expect(responseJson.data.thread.id).toEqual(
+        postThreadResponse.data.addedThread.id,
+      );
+      expect(responseJson.data.thread.title).toEqual(requestPayload.title);
+      expect(responseJson.data.thread.body).toEqual(requestPayload.body);
+      expect(responseJson.data.thread.username).toEqual(loginPayload.username);
+      expect(Array.isArray(responseJson.data.thread.comments)).toBe(true);
     });
   });
 });
