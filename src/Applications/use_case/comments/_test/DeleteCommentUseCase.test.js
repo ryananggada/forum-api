@@ -15,6 +15,9 @@ describe('DeleteCommentUseCase', () => {
       id: 'user-123',
     };
 
+    mockCommentRepository.checkAvailabilityComment = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve());
     mockCommentRepository.verifyCommentOwner = jest
       .fn()
       .mockImplementation(() => Promise.resolve());

@@ -1,3 +1,4 @@
+const CommentRepository = require('../../../../Domains/comments/CommentRepository');
 const AddedReply = require('../../../../Domains/replies/entities/AddedReply');
 const NewReply = require('../../../../Domains/replies/entities/NewReply');
 const ReplyRepository = require('../../../../Domains/replies/ReplyRepository');
@@ -27,11 +28,15 @@ describe('AddReplyUseCase', () => {
     });
 
     const mockReplyRepository = new ReplyRepository();
+    const mockCommentRepository = new CommentRepository();
     const mockThreadRepository = new ThreadRepository();
 
     mockThreadRepository.getThreadById = jest
       .fn()
       .mockImplementation(() => Promise.resolve(mockThread));
+    mockCommentRepository.checkAvailabilityComment = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve());
     mockReplyRepository.addReply = jest
       .fn()
       .mockImplementation(() => Promise.resolve(mockAddedReply));
@@ -39,6 +44,7 @@ describe('AddReplyUseCase', () => {
     const addReplyUseCase = new AddReplyUseCase({
       replyRepository: mockReplyRepository,
       threadRepository: mockThreadRepository,
+      commentRepository: mockCommentRepository,
     });
     const addedReply = await addReplyUseCase.execute(
       mockComment.id,

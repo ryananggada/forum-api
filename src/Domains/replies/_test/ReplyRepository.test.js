@@ -13,6 +13,9 @@ describe('ReplyRepository interface', () => {
     await expect(replyRepository.deleteReplyById('')).rejects.toThrow(
       'REPLY_REPOSITORY.METHOD_NOT_IMPLEMENTED',
     );
+    await expect(replyRepository.checkAvailabilityReply('')).rejects.toThrow(
+      'REPLY_REPOSITORY.METHOD_NOT_IMPLEMENTED',
+    );
     await expect(replyRepository.verifyReplyOwner('', '')).rejects.toThrow(
       'REPLY_REPOSITORY.METHOD_NOT_IMPLEMENTED',
     );

@@ -52,6 +52,19 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     return result.rows;
   }
 
+  async checkAvailabilityReply(id) {
+    const query = {
+      text: 'SELECT * FROM replies WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('reply tidak ditemukan');
+    }
+  }
+
   async deleteReplyById(threadId, commentId, replyId) {
     const query = {
       text: `
@@ -67,11 +80,7 @@ class ReplyRepositoryPostgres extends ReplyRepository {
       values: [threadId, commentId, replyId],
     };
 
-    const result = await this._pool.query(query);
-
-    if (!result.rowCount) {
-      throw new NotFoundError('reply tidak ditemukan');
-    }
+    await this._pool.query(query);
   }
 
   async verifyReplyOwner(replyId, userId) {

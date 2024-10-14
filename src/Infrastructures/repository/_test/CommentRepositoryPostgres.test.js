@@ -112,15 +112,31 @@ describe('CommentRepositoryPostgres', () => {
     });
   });
 
-  describe('deleteCommentById function', () => {
-    it('should throw NotFoundError if comment is not found', async () => {
+  describe('checkAvailabilityComment function', () => {
+    it('should throw error if comment is not found', async () => {
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
 
       await expect(
-        commentRepositoryPostgres.deleteCommentById('comment-123'),
+        commentRepositoryPostgres.checkAvailabilityComment('comment-123'),
       ).rejects.toThrowError(NotFoundError);
     });
 
+    it('should not throw error if comment is available', async () => {
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-123',
+        threadId: 'thread-123',
+        userId: 'user-123',
+      });
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      await expect(
+        commentRepositoryPostgres.checkAvailabilityComment('comment-123'),
+      ).resolves.not.toThrowError(NotFoundError);
+    });
+  });
+
+  describe('deleteCommentById function', () => {
     it('should be able to delete comment', async () => {
       await CommentsTableTestHelper.addComment({
         id: 'comment-123',

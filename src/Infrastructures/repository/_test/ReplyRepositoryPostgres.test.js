@@ -116,19 +116,31 @@ describe('ReplyRepositoryPostgres', () => {
     });
   });
 
-  describe('deleteReplyById function', () => {
-    it('should throw NotFoundError if reply is not found', async () => {
+  describe('checkAvailabilityReply function', () => {
+    it('should throw error if reply is not found', async () => {
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
 
       await expect(
-        replyRepositoryPostgres.deleteReplyById(
-          'thread-123',
-          'comment-123',
-          'reply-123',
-        ),
+        replyRepositoryPostgres.checkAvailabilityReply('reply-123'),
       ).rejects.toThrowError(NotFoundError);
     });
 
+    it('should not throw error if reply is available', async () => {
+      await RepliesTableTestHelper.addReply({
+        id: 'reply-123',
+        commentId: 'comment-123',
+        threadId: 'thread-123',
+        userId: 'user-123',
+      });
+
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+      await expect(
+        replyRepositoryPostgres.checkAvailabilityReply('reply-123'),
+      ).resolves.not.toThrowError(NotFoundError);
+    });
+  });
+
+  describe('deleteReplyById function', () => {
     it('should be able to delete reply', async () => {
       await RepliesTableTestHelper.addReply({
         id: 'reply-123',

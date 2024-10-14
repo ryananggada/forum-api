@@ -17,16 +17,13 @@ class GetThreadDetailUseCase {
 
   async execute(threadId) {
     const threadFromId = await this._threadRepository.getThreadById(threadId);
-    const { username: threadUsername } = await this._userRepository.getUserById(
-      threadFromId.user_id,
-    );
 
     const thread = new ThreadDetail({
       id: threadFromId.id,
       title: threadFromId.title,
       body: threadFromId.body,
       date: threadFromId.created_at.toString(),
-      username: threadUsername,
+      username: threadFromId.username,
       comments: [],
     });
 
@@ -36,13 +33,10 @@ class GetThreadDetailUseCase {
     if (commentsInThread.length > 0) {
       const commentDetails = await Promise.all(
         commentsInThread.map(async (comment) => {
-          const { username: commentUsername } =
-            await this._userRepository.getUserById(comment.user_id);
-
           const commentDetail = new CommentDetail({
             id: comment.id,
-            username: commentUsername,
-            date: comment.created_at,
+            username: comment.username,
+            date: comment.created_at.toString(),
             content: comment.content,
             replies: [],
           });
@@ -52,16 +46,15 @@ class GetThreadDetailUseCase {
 
           if (repliesInComment.length > 0) {
             const replyDetails = await Promise.all(
-              repliesInComment.map(async (reply) => {
-                const { username: replyUsername } =
-                  await this._userRepository.getUserById(reply.user_id);
-                return new ReplyDetail({
-                  id: reply.id,
-                  content: reply.content,
-                  date: reply.created_at,
-                  username: replyUsername,
-                });
-              }),
+              repliesInComment.map(
+                async (reply) =>
+                  new ReplyDetail({
+                    id: reply.id,
+                    content: reply.content,
+                    date: reply.created_at.toString(),
+                    username: reply.username,
+                  }),
+              ),
             );
 
             commentDetail.replies.push(...replyDetails);

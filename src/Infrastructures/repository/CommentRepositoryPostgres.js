@@ -52,6 +52,19 @@ class CommentRepositoryPostgres extends CommentRepository {
     return result.rows;
   }
 
+  async checkAvailabilityComment(id) {
+    const query = {
+      text: 'SELECT * FROM comments WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('comment tidak ditemukan');
+    }
+  }
+
   async deleteCommentById(threadId, commentId) {
     const query = {
       text: `
@@ -62,11 +75,7 @@ class CommentRepositoryPostgres extends CommentRepository {
       values: [threadId, commentId],
     };
 
-    const result = await this._pool.query(query);
-
-    if (!result.rowCount) {
-      throw new NotFoundError('comment tidak ditemukan');
-    }
+    await this._pool.query(query);
   }
 
   async verifyCommentOwner(commentId, userId) {
