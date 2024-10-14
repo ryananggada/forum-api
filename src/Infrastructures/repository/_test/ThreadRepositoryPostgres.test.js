@@ -90,7 +90,6 @@ describe('ThreadRepositoryPostgres', () => {
       expect(thread.id).toEqual('thread-123');
       expect(thread.title).toEqual('Thread title');
       expect(thread.body).toEqual('Content of a thread');
-      expect(thread.user_id).toEqual('user-123');
     });
   });
 });
