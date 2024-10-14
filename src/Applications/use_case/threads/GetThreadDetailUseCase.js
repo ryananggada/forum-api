@@ -25,7 +25,7 @@ class GetThreadDetailUseCase {
       id: threadFromId.id,
       title: threadFromId.title,
       body: threadFromId.body,
-      date: threadFromId.created_at.toISOString(),
+      date: threadFromId.created_at.toString(),
       username: threadUsername,
       comments: [],
     });

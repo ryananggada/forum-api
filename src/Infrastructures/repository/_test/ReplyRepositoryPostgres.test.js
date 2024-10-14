@@ -138,7 +138,11 @@ describe('ReplyRepositoryPostgres', () => {
       });
 
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
-      replyRepositoryPostgres.deleteReplyById('comment-123', 'reply-123');
+      replyRepositoryPostgres.deleteReplyById(
+        'thread-123',
+        'comment-123',
+        'reply-123',
+      );
 
       const replies = await replyRepositoryPostgres.getRepliesByCommentId(
         'comment-123',

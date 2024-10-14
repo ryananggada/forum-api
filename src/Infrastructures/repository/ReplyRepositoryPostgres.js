@@ -52,14 +52,19 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     return result.rows;
   }
 
-  async deleteReplyById(commentId, replyId) {
+  async deleteReplyById(threadId, commentId, replyId) {
     const query = {
       text: `
-        UPDATE replies
+        UPDATE replies r
         SET is_delete = true
-        WHERE  comment_id = $1 AND id = $2
+        FROM comments c
+        INNER JOIN threads t ON c.thread_id = t.id
+        WHERE r.comment_id = c.id
+          AND t.id = $1
+          AND r.comment_id = $2
+          AND r.id = $3
       `,
-      values: [commentId, replyId],
+      values: [threadId, commentId, replyId],
     };
 
     const result = await this._pool.query(query);
@@ -78,7 +83,7 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     const result = await this._pool.query(query);
 
     if (!result.rowCount) {
-      throw new AuthorizationError('bukan pemilik reply');
+      throw new AuthorizationError('unauthorized, not the owner of reply');
     }
   }
 }

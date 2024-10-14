@@ -2,6 +2,7 @@ const pool = require('../../database/postgres/pool');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
+const AuthenticationsTableTestHelper = require('../../../../tests/AuthenticationsTableTestHelper');
 const container = require('../../container');
 const createServer = require('../createServer');
 
@@ -14,6 +15,7 @@ describe('/threads/{threadId}/comments endpoint', () => {
     await CommentsTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
     await UsersTableTestHelper.cleanTable();
+    await AuthenticationsTableTestHelper.cleanTable();
   });
 
   describe('when POST /threads/{threadId}/comments', () => {
@@ -206,7 +208,59 @@ describe('/threads/{threadId}/comments endpoint', () => {
   });
 
   describe('when DELETE /threads/{threadId}/comments/{commentId}', () => {
-    it('it should response 401 when there is missing authentication', async () => {});
+    it('it should response 401 when there is missing authentication', async () => {
+      const loginPayload = {
+        username: 'ryananggada',
+        password: 'password123',
+      };
+      const threadPayload = {
+        title: 'My title',
+        body: 'The body of thread goes here',
+      };
+      const requestPayload = {
+        content: 'My comment',
+      };
+
+      const server = await createServer(container);
+
+      await server.inject({
+        method: 'POST',
+        url: '/users',
+        payload: {
+          username: loginPayload.username,
+          password: loginPayload.password,
+          fullname: 'Ryan Anggada',
+        },
+      });
+
+      const auth = await server.inject({
+        method: 'POST',
+        url: '/authentications',
+        payload: loginPayload,
+      });
+      const authResponse = JSON.parse(auth.payload);
+      const authToken = authResponse.data.accessToken;
+
+      const thread = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        payload: threadPayload,
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      const threadResponse = JSON.parse(thread.payload);
+      const threadId = threadResponse.data.addedThread.id;
+
+      const response = await server.inject({
+        method: 'POST',
+        url: `/threads/${threadId}/comments`,
+        payload: requestPayload,
+      });
+      const responseJson = JSON.parse(response.payload);
+
+      expect(response.statusCode).toEqual(401);
+      expect(responseJson.error).toEqual('Unauthorized');
+      expect(responseJson.message).toEqual('Missing authentication');
+    });
 
     it('it should response 403 if not the owner of comment try to delete the comment', async () => {
       const loginPayload = {
@@ -283,7 +337,6 @@ describe('/threads/{threadId}/comments endpoint', () => {
       const response = await server.inject({
         method: 'DELETE',
         url: `/threads/${threadId}/comments/${commentId}`,
-        payload: requestPayload,
         headers: { Authorization: `Bearer ${notOwnerToken}` },
       });
       const responseJson = JSON.parse(response.payload);
@@ -293,6 +346,68 @@ describe('/threads/{threadId}/comments endpoint', () => {
       expect(responseJson.message).toEqual(
         'unauthorized, not the owner of comment',
       );
+    });
+
+    it('should response 200 when deleting comment successfully', async () => {
+      const loginPayload = {
+        username: 'ryananggada',
+        password: 'password123',
+      };
+      const threadPayload = {
+        title: 'My title',
+        body: 'The body of thread goes here',
+      };
+      const requestPayload = {
+        content: 'My comment',
+      };
+
+      const server = await createServer(container);
+
+      await server.inject({
+        method: 'POST',
+        url: '/users',
+        payload: {
+          username: loginPayload.username,
+          password: loginPayload.password,
+          fullname: 'Ryan Anggada',
+        },
+      });
+
+      const auth = await server.inject({
+        method: 'POST',
+        url: '/authentications',
+        payload: loginPayload,
+      });
+      const authResponse = JSON.parse(auth.payload);
+      const authToken = authResponse.data.accessToken;
+
+      const thread = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        payload: threadPayload,
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      const threadResponse = JSON.parse(thread.payload);
+      const threadId = threadResponse.data.addedThread.id;
+
+      const comment = await server.inject({
+        method: 'POST',
+        url: `/threads/${threadId}/comments`,
+        payload: requestPayload,
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      const commentResponse = JSON.parse(comment.payload);
+      const commentId = commentResponse.data.addedComment.id;
+
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}/comments/${commentId}`,
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      const responseJson = JSON.parse(response.payload);
+
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.status).toEqual('success');
     });
   });
 });
