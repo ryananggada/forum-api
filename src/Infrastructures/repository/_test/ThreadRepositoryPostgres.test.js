@@ -7,10 +7,11 @@ const AddedThread = require('../../../Domains/threads/entities/AddedThread');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('ThreadRepositoryPostgres', () => {
-  const userId = 'user-123';
-
   beforeAll(async () => {
-    await UsersTableTestHelper.addUser({ id: userId });
+    await UsersTableTestHelper.addUser({
+      id: 'user-123',
+      username: 'ryananggada',
+    });
   });
 
   afterEach(async () => {
@@ -90,6 +91,7 @@ describe('ThreadRepositoryPostgres', () => {
       expect(thread.id).toEqual('thread-123');
       expect(thread.title).toEqual('Thread title');
       expect(thread.body).toEqual('Content of a thread');
+      expect(thread.username).toEqual('ryananggada');
     });
   });
 

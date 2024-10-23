@@ -3,6 +3,7 @@ const CommentRepository = require('../../../../Domains/comments/CommentRepositor
 const ReplyRepository = require('../../../../Domains/replies/ReplyRepository');
 const UserRepository = require('../../../../Domains/users/UserRepository');
 const GetThreadDetailUseCase = require('../GetThreadDetailUseCase');
+const ThreadDetail = require('../../../../Domains/threads/entities/ThreadDetail');
 
 describe('GetThreadDetailUseCase', () => {
   it('should orchestrating the get thread detail action with comments and replies correctly', async () => {
@@ -26,7 +27,7 @@ describe('GetThreadDetailUseCase', () => {
     const mockThreadData = {
       id: 'thread-123',
       title: 'My thread',
-      body: 'Thread content goes here.',
+      body: 'Thread content goes here',
       created_at: '2024-10-04T10:24:47.551Z',
       username: 'johncena',
     };
@@ -111,12 +112,44 @@ describe('GetThreadDetailUseCase', () => {
 
     const threadDetail = await getThreadDetailUseCase.execute('thread-123');
 
-    expect(threadDetail.comments).toHaveLength(2);
-    expect(threadDetail.comments[0].username).toEqual(userB.username);
-    expect(threadDetail.comments[1].username).toEqual(userA.username);
-    expect(threadDetail.comments[0].replies).toHaveLength(2);
-    expect(threadDetail.comments[1].replies).toHaveLength(0);
     expect(mockThreadRepository.getThreadById).toBeCalledWith('thread-123');
+    expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(
+      'thread-123',
+    );
+    expect(mockReplyRepository.getRepliesByCommentId).toBeCalledWith(
+      'comment-123',
+    );
+
+    expect(threadDetail.id).toEqual('thread-123');
+    expect(threadDetail.title).toEqual('My thread');
+    expect(threadDetail.body).toEqual('Thread content goes here');
+    expect(threadDetail.username).toEqual('johncena');
+
+    expect(threadDetail.comments).toHaveLength(2);
+
+    expect(threadDetail.comments[0].id).toEqual('comment-123');
+    expect(threadDetail.comments[0].username).toEqual('ryananggada');
+    expect(threadDetail.comments[0].content).toEqual('Test comment one');
+
+    expect(threadDetail.comments[1].id).toEqual('comment-625');
+    expect(threadDetail.comments[1].username).toEqual('johncena');
+    expect(threadDetail.comments[1].content).toEqual('Test comment two');
+
+    expect(threadDetail.comments[0].replies).toHaveLength(2);
+
+    expect(threadDetail.comments[0].replies[0].id).toEqual('reply-123');
+    expect(threadDetail.comments[0].replies[0].username).toEqual('johncena');
+    expect(threadDetail.comments[0].replies[0].content).toEqual(
+      'Reply goes here',
+    );
+
+    expect(threadDetail.comments[0].replies[1].id).toEqual('reply-207');
+    expect(threadDetail.comments[0].replies[1].username).toEqual('ryananggada');
+    expect(threadDetail.comments[0].replies[1].content).toEqual(
+      'Reply goes here again',
+    );
+
+    expect(threadDetail.comments[1].replies).toHaveLength(0);
   });
 
   it('should orchestrating the get thread detail action without comments and replies correctly', async () => {
@@ -134,7 +167,7 @@ describe('GetThreadDetailUseCase', () => {
     const mockThreadData = {
       id: 'thread-123',
       title: 'My thread',
-      body: 'Thread content goes here.',
+      body: 'Thread content goes here',
       created_at: '2024-10-04T10:24:47.551Z',
       username: 'johncena',
     };

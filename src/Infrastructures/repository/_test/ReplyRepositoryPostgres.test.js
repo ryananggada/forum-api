@@ -15,7 +15,10 @@ describe('ReplyRepositoryPostgres', () => {
   const commentId = 'comment-123';
 
   beforeAll(async () => {
-    await UsersTableTestHelper.addUser({ id: 'user-123' });
+    await UsersTableTestHelper.addUser({
+      id: 'user-123',
+      username: 'ryananggada',
+    });
     await ThreadsTableTestHelper.addThread({ id: threadId, userId });
     await CommentsTableTestHelper.addComment({
       id: commentId,
@@ -88,12 +91,14 @@ describe('ReplyRepositoryPostgres', () => {
         commentId: 'comment-123',
         threadId: 'thread-123',
         userId: 'user-123',
+        content: 'Reply One',
       });
       await RepliesTableTestHelper.addReply({
         id: 'reply-456',
         commentId: 'comment-123',
         threadId: 'thread-123',
         userId: 'user-123',
+        content: 'Reply Two',
       });
 
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
@@ -101,7 +106,18 @@ describe('ReplyRepositoryPostgres', () => {
       const replies = await replyRepositoryPostgres.getRepliesByCommentId(
         'comment-123',
       );
+
       expect(replies).toHaveLength(2);
+
+      expect(replies[0].id).toEqual('reply-123');
+      expect(replies[0].username).toEqual('ryananggada');
+      expect(replies[0].is_delete).toEqual(false);
+      expect(replies[0].content).toEqual('Reply One');
+
+      expect(replies[1].id).toEqual('reply-456');
+      expect(replies[1].username).toEqual('ryananggada');
+      expect(replies[1].is_delete).toEqual(false);
+      expect(replies[1].content).toEqual('Reply Two');
     });
 
     it('should return empty replies but does not throw error', async () => {
@@ -189,7 +205,7 @@ describe('ReplyRepositoryPostgres', () => {
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
       await expect(
         replyRepositoryPostgres.verifyReplyOwner('reply-123', 'user-123'),
-      ).resolves.toBe();
+      ).resolves.not.toThrowError(AuthorizationError);
     });
   });
 });

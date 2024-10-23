@@ -9,14 +9,16 @@ const pool = require('../../database/postgres/pool');
 const CommentRepositoryPostgres = require('../CommentRepositoryPostgres');
 
 describe('CommentRepositoryPostgres', () => {
-  const userId = 'user-123';
-  const threadId = 'thread-123';
-
   beforeAll(async () => {
-    await UsersTableTestHelper.addUser({ id: userId });
+    await UsersTableTestHelper.addUser({
+      id: 'user-123',
+      username: 'ryananggada',
+    });
     await ThreadsTableTestHelper.addThread({
-      id: threadId,
-      userId,
+      id: 'thread-123',
+      title: 'Title goes here',
+      body: 'My content filled here',
+      userId: 'user-123',
     });
   });
 
@@ -84,11 +86,13 @@ describe('CommentRepositoryPostgres', () => {
         id: 'comment-123',
         threadId: 'thread-123',
         userId: 'user-123',
+        content: 'Comment One',
       });
       await CommentsTableTestHelper.addComment({
         id: 'comment-456',
         threadId: 'thread-123',
         userId: 'user-123',
+        content: 'Comment Two',
       });
 
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
@@ -97,9 +101,17 @@ describe('CommentRepositoryPostgres', () => {
         'thread-123',
       );
 
-      expect(comments[0].id).toEqual('comment-123');
-      expect(comments[1].id).toEqual('comment-456');
       expect(comments).toHaveLength(2);
+
+      expect(comments[0].id).toEqual('comment-123');
+      expect(comments[0].username).toEqual('ryananggada');
+      expect(comments[0].is_delete).toEqual(false);
+      expect(comments[0].content).toEqual('Comment One');
+
+      expect(comments[1].id).toEqual('comment-456');
+      expect(comments[1].username).toEqual('ryananggada');
+      expect(comments[1].is_delete).toEqual(false);
+      expect(comments[1].content).toEqual('Comment Two');
     });
 
     it('should return empty comments but does not throw error', async () => {
