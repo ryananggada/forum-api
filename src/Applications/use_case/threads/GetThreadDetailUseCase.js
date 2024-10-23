@@ -39,6 +39,7 @@ class GetThreadDetailUseCase {
             date: comment.created_at.toString(),
             content: comment.content,
             replies: [],
+            isDelete: comment.is_delete,
           });
 
           const repliesInComment =
@@ -53,6 +54,7 @@ class GetThreadDetailUseCase {
                     content: reply.content,
                     date: reply.created_at.toString(),
                     username: reply.username,
+                    isDelete: reply.is_delete,
                   }),
               ),
             );
