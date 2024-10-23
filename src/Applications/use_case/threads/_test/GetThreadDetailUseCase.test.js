@@ -5,7 +5,7 @@ const UserRepository = require('../../../../Domains/users/UserRepository');
 const GetThreadDetailUseCase = require('../GetThreadDetailUseCase');
 
 describe('GetThreadDetailUseCase', () => {
-  it('should orchestrating the get thread detail action correctly', async () => {
+  it('should orchestrating the get thread detail action with comments and replies correctly', async () => {
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
@@ -116,6 +116,52 @@ describe('GetThreadDetailUseCase', () => {
     expect(threadDetail.comments[1].username).toEqual(userA.username);
     expect(threadDetail.comments[0].replies).toHaveLength(2);
     expect(threadDetail.comments[1].replies).toHaveLength(0);
+    expect(mockThreadRepository.getThreadById).toBeCalledWith('thread-123');
+  });
+
+  it('should orchestrating the get thread detail action without comments and replies correctly', async () => {
+    const mockThreadRepository = new ThreadRepository();
+    const mockCommentRepository = new CommentRepository();
+    const mockReplyRepository = new ReplyRepository();
+    const mockUserRepository = new UserRepository();
+
+    const mockUserData = {
+      id: 'user-123',
+      username: 'johncena',
+      fullname: 'John Cena',
+    };
+
+    const mockThreadData = {
+      id: 'thread-123',
+      title: 'My thread',
+      body: 'Thread content goes here.',
+      created_at: '2024-10-04T10:24:47.551Z',
+      username: 'johncena',
+    };
+
+    mockUserRepository.getUserById = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve(mockUserData));
+    mockThreadRepository.getThreadById = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve(mockThreadData));
+    mockCommentRepository.getCommentsByThreadId = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve([]));
+    mockReplyRepository.getRepliesByCommentId = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve([]));
+
+    const getThreadDetailUseCase = new GetThreadDetailUseCase({
+      threadRepository: mockThreadRepository,
+      userRepository: mockUserRepository,
+      commentRepository: mockCommentRepository,
+      replyRepository: mockReplyRepository,
+    });
+
+    const threadDetail = await getThreadDetailUseCase.execute('thread-123');
+
+    expect(threadDetail.comments).toHaveLength(0);
     expect(mockThreadRepository.getThreadById).toBeCalledWith('thread-123');
   });
 });

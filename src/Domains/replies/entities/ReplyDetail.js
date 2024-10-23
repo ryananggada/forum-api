@@ -2,7 +2,7 @@ class ReplyDetail {
   constructor(payload) {
     this._verifyPayload(payload);
 
-    const { id, content, date, username } = payload;
+    const { id, content, date, username } = this._remapPayload(payload);
 
     this.id = id;
     this.content = content;
@@ -23,6 +23,15 @@ class ReplyDetail {
     ) {
       throw new Error('REPLY_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
+  }
+
+  _remapPayload({ id, content, date, username, isDelete }) {
+    return {
+      id,
+      content: isDelete ? '**balasan telah dihapus**' : content,
+      date,
+      username,
+    };
   }
 }
 

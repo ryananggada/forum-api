@@ -2,7 +2,8 @@ class CommentDetail {
   constructor(payload) {
     this._verifyPayload(payload);
 
-    const { id, username, date, content, replies } = payload;
+    const { id, username, date, content, replies } =
+      this._remapPayload(payload);
 
     this.id = id;
     this.username = username;
@@ -25,6 +26,16 @@ class CommentDetail {
     ) {
       throw new Error('COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
+  }
+
+  _remapPayload({ id, username, date, content, replies, isDelete }) {
+    return {
+      id,
+      username,
+      date,
+      content: isDelete ? '**komentar telah dihapus**' : content,
+      replies,
+    };
   }
 }
 

@@ -97,6 +97,8 @@ describe('CommentRepositoryPostgres', () => {
         'thread-123',
       );
 
+      expect(comments[0].id).toEqual('comment-123');
+      expect(comments[1].id).toEqual('comment-456');
       expect(comments).toHaveLength(2);
     });
 
@@ -150,7 +152,7 @@ describe('CommentRepositoryPostgres', () => {
       const comments = await commentRepositoryPostgres.getCommentsByThreadId(
         'thread-123',
       );
-      expect(comments[0].content).toEqual('**komentar telah dihapus**');
+      expect(comments[0].is_delete).toEqual(true);
     });
   });
 
@@ -178,7 +180,7 @@ describe('CommentRepositoryPostgres', () => {
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
       await expect(
         commentRepositoryPostgres.verifyCommentOwner('comment-123', 'user-123'),
-      ).resolves.toBe();
+      ).resolves.not.toThrowError(AuthorizationError);
     });
   });
 });

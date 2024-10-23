@@ -34,6 +34,9 @@ describe('DeleteCommentUseCase', () => {
       mockUser.id,
     );
 
+    expect(mockCommentRepository.checkAvailabilityComment).toBeCalledWith(
+      mockComment.id,
+    );
     expect(mockCommentRepository.verifyCommentOwner).toBeCalledWith(
       mockComment.id,
       mockUser.id,

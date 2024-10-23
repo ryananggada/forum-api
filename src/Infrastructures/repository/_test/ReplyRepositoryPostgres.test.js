@@ -159,7 +159,7 @@ describe('ReplyRepositoryPostgres', () => {
       const replies = await replyRepositoryPostgres.getRepliesByCommentId(
         'comment-123',
       );
-      expect(replies[0].content).toEqual('**balasan telah dihapus**');
+      expect(replies[0].is_delete).toEqual(true);
     });
   });
 

@@ -26,18 +26,36 @@ describe('ReplyDetail entities', () => {
     );
   });
 
-  it('should create ReplyDetail object correctly', () => {
+  it('should create ReplyDetail object correctly when isDelete is false', () => {
     const payload = {
       id: 'reply-123',
       content: 'Nice article!',
       date: '2024-10-03T08:21:59.972Z',
       username: 'johncena',
+      isDelete: false,
     };
 
     const { id, content, date, username } = new ReplyDetail(payload);
 
     expect(id).toEqual(payload.id);
     expect(content).toEqual(payload.content);
+    expect(date).toEqual(payload.date);
+    expect(username).toEqual(payload.username);
+  });
+
+  it('should create ReplyDetail object correctly when isDelete is true', () => {
+    const payload = {
+      id: 'reply-123',
+      content: 'Nice article!',
+      date: '2024-10-03T08:21:59.972Z',
+      username: 'johncena',
+      isDelete: true,
+    };
+
+    const { id, content, date, username } = new ReplyDetail(payload);
+
+    expect(id).toEqual(payload.id);
+    expect(content).toEqual('**balasan telah dihapus**');
     expect(date).toEqual(payload.date);
     expect(username).toEqual(payload.username);
   });

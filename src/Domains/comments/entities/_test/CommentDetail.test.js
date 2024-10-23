@@ -28,13 +28,14 @@ describe('CommentDetail entities', () => {
     );
   });
 
-  it('should create CommentDetail object correctly', () => {
+  it('should create CommentDetail object correctly when isDeleted is false', () => {
     const payload = {
       id: 'comment-123',
       username: 'user-456',
       date: '2022-09-09T09:15:30.338Z',
       content: 'Nice article!',
       replies: [],
+      isDelete: false,
     };
 
     const { id, username, date, content, replies } = new CommentDetail(payload);
@@ -43,6 +44,25 @@ describe('CommentDetail entities', () => {
     expect(username).toEqual(payload.username);
     expect(date).toEqual(payload.date);
     expect(content).toEqual(payload.content);
+    expect(replies).toEqual(payload.replies);
+  });
+
+  it('should create CommentDetail object correctly when isDeleted is true', () => {
+    const payload = {
+      id: 'comment-123',
+      username: 'user-456',
+      date: '2022-09-09T09:15:30.338Z',
+      content: 'Nice article!',
+      replies: [],
+      isDelete: true,
+    };
+
+    const { id, username, date, content, replies } = new CommentDetail(payload);
+
+    expect(id).toEqual(payload.id);
+    expect(username).toEqual(payload.username);
+    expect(date).toEqual(payload.date);
+    expect(content).toEqual('**komentar telah dihapus**');
     expect(replies).toEqual(payload.replies);
   });
 });
