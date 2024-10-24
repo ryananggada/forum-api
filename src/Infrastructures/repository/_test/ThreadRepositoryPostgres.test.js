@@ -88,10 +88,13 @@ describe('ThreadRepositoryPostgres', () => {
 
       const thread = await threadRepositoryPostgres.getThreadById('thread-123');
 
-      expect(thread.id).toEqual('thread-123');
-      expect(thread.title).toEqual('Thread title');
-      expect(thread.body).toEqual('Content of a thread');
-      expect(thread.username).toEqual('ryananggada');
+      expect(thread).toStrictEqual({
+        id: 'thread-123',
+        title: 'Thread title',
+        body: 'Content of a thread',
+        username: 'ryananggada',
+        created_at: expect.any(Date),
+      });
     });
   });
 

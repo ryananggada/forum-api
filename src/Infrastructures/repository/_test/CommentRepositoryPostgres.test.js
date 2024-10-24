@@ -87,12 +87,14 @@ describe('CommentRepositoryPostgres', () => {
         threadId: 'thread-123',
         userId: 'user-123',
         content: 'Comment One',
+        createdAt: '2024-10-24T16:58:47.174Z',
       });
       await CommentsTableTestHelper.addComment({
         id: 'comment-456',
         threadId: 'thread-123',
         userId: 'user-123',
         content: 'Comment Two',
+        createdAt: '2024-10-24T16:58:59.015Z',
       });
 
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
@@ -103,15 +105,21 @@ describe('CommentRepositoryPostgres', () => {
 
       expect(comments).toHaveLength(2);
 
-      expect(comments[0].id).toEqual('comment-123');
-      expect(comments[0].username).toEqual('ryananggada');
-      expect(comments[0].is_delete).toEqual(false);
-      expect(comments[0].content).toEqual('Comment One');
+      expect(comments[0]).toStrictEqual({
+        id: 'comment-123',
+        username: 'ryananggada',
+        content: 'Comment One',
+        is_delete: false,
+        created_at: expect.any(Date),
+      });
 
-      expect(comments[1].id).toEqual('comment-456');
-      expect(comments[1].username).toEqual('ryananggada');
-      expect(comments[1].is_delete).toEqual(false);
-      expect(comments[1].content).toEqual('Comment Two');
+      expect(comments[1]).toStrictEqual({
+        id: 'comment-456',
+        username: 'ryananggada',
+        content: 'Comment Two',
+        is_delete: false,
+        created_at: expect.any(Date),
+      });
     });
 
     it('should return empty comments but does not throw error', async () => {

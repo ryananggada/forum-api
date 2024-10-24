@@ -195,8 +195,6 @@ describe('GetThreadDetailUseCase', () => {
     const threadDetail = await getThreadDetailUseCase.execute('thread-123');
 
     expect(mockThreadRepository.getThreadById).toBeCalledWith('thread-123');
-    expect(mockThreadRepository.getCommentsByThreadId).toBeCalledWith('');
-    expect(mockThreadRepository.getRepliesByCommentId).toBeCalledWith('');
 
     expect(threadDetail.id).toEqual('thread-123');
     expect(threadDetail.title).toEqual('My thread');

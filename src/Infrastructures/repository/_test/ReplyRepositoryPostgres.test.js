@@ -109,15 +109,21 @@ describe('ReplyRepositoryPostgres', () => {
 
       expect(replies).toHaveLength(2);
 
-      expect(replies[0].id).toEqual('reply-123');
-      expect(replies[0].username).toEqual('ryananggada');
-      expect(replies[0].is_delete).toEqual(false);
-      expect(replies[0].content).toEqual('Reply One');
+      expect(replies[0]).toStrictEqual({
+        id: 'reply-123',
+        username: 'ryananggada',
+        content: 'Reply One',
+        is_delete: false,
+        created_at: expect.any(Date),
+      });
 
-      expect(replies[1].id).toEqual('reply-456');
-      expect(replies[1].username).toEqual('ryananggada');
-      expect(replies[1].is_delete).toEqual(false);
-      expect(replies[1].content).toEqual('Reply Two');
+      expect(replies[1]).toStrictEqual({
+        id: 'reply-456',
+        username: 'ryananggada',
+        content: 'Reply Two',
+        is_delete: false,
+        created_at: expect.any(Date),
+      });
     });
 
     it('should return empty replies but does not throw error', async () => {
