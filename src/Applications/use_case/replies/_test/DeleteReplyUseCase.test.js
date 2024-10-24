@@ -38,6 +38,9 @@ describe('DeleteReplyUseCase', () => {
       mockUser.id,
     );
 
+    expect(mockReplyRepository.checkAvailabilityReply).toBeCalledWith(
+      mockReply.id,
+    );
     expect(mockReplyRepository.verifyReplyOwner).toBeCalledWith(
       mockReply.id,
       mockUser.id,

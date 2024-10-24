@@ -194,7 +194,14 @@ describe('GetThreadDetailUseCase', () => {
 
     const threadDetail = await getThreadDetailUseCase.execute('thread-123');
 
-    expect(threadDetail.comments).toHaveLength(0);
     expect(mockThreadRepository.getThreadById).toBeCalledWith('thread-123');
+    expect(mockThreadRepository.getCommentsByThreadId).toBeCalledWith('');
+    expect(mockThreadRepository.getRepliesByCommentId).toBeCalledWith('');
+
+    expect(threadDetail.id).toEqual('thread-123');
+    expect(threadDetail.title).toEqual('My thread');
+    expect(threadDetail.body).toEqual('Thread content goes here');
+    expect(threadDetail.username).toEqual('johncena');
+    expect(threadDetail.comments).toHaveLength(0);
   });
 });
