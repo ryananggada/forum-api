@@ -3,7 +3,6 @@ const CommentRepository = require('../../../../Domains/comments/CommentRepositor
 const ReplyRepository = require('../../../../Domains/replies/ReplyRepository');
 const UserRepository = require('../../../../Domains/users/UserRepository');
 const GetThreadDetailUseCase = require('../GetThreadDetailUseCase');
-const ThreadDetail = require('../../../../Domains/threads/entities/ThreadDetail');
 
 describe('GetThreadDetailUseCase', () => {
   it('should orchestrating the get thread detail action with comments and replies correctly', async () => {
@@ -11,18 +10,6 @@ describe('GetThreadDetailUseCase', () => {
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
     const mockUserRepository = new UserRepository();
-
-    const userA = {
-      id: 'user-123',
-      username: 'johncena',
-      fullname: 'John Cena',
-    };
-
-    const userB = {
-      id: 'user-456',
-      username: 'ryananggada',
-      fullname: 'Ryan Anggada',
-    };
 
     const mockThreadData = {
       id: 'thread-123',
@@ -46,7 +33,7 @@ describe('GetThreadDetailUseCase', () => {
         content: 'Test comment two',
         thread_id: 'thread-123',
         created_at: '2024-10-07T02:54:10.771Z',
-        is_delete: false,
+        is_delete: true,
         username: 'johncena',
       },
     ];
@@ -64,35 +51,18 @@ describe('GetThreadDetailUseCase', () => {
         id: 'reply-207',
         content: 'Reply goes here again',
         comment_id: 'comment-123',
-        is_delete: false,
+        is_delete: true,
         created_at: '2024-10-07T02:55:46.810Z',
         username: 'ryananggada',
       },
     ];
 
-    mockUserRepository.getUserById = jest.fn().mockImplementation((userId) => {
-      if (userId === 'user-123') {
-        return Promise.resolve(userA);
-      }
-
-      if (userId === 'user-456') {
-        return Promise.resolve(userB);
-      }
-
-      return Promise.resolve({});
-    });
     mockThreadRepository.getThreadById = jest
       .fn()
       .mockImplementation(() => Promise.resolve(mockThreadData));
     mockCommentRepository.getCommentsByThreadId = jest
       .fn()
-      .mockImplementation((threadId) => {
-        if (threadId === 'thread-123') {
-          return Promise.resolve(mockCommentData);
-        }
-
-        return Promise.resolve([]);
-      });
+      .mockImplementation(() => Promise.resolve(mockCommentData));
     mockReplyRepository.getRepliesByCommentId = jest
       .fn()
       .mockImplementation((commentId) => {
@@ -133,7 +103,9 @@ describe('GetThreadDetailUseCase', () => {
 
     expect(threadDetail.comments[1].id).toEqual('comment-625');
     expect(threadDetail.comments[1].username).toEqual('johncena');
-    expect(threadDetail.comments[1].content).toEqual('Test comment two');
+    expect(threadDetail.comments[1].content).toEqual(
+      '**komentar telah dihapus**',
+    );
 
     expect(threadDetail.comments[0].replies).toHaveLength(2);
 
@@ -146,7 +118,7 @@ describe('GetThreadDetailUseCase', () => {
     expect(threadDetail.comments[0].replies[1].id).toEqual('reply-207');
     expect(threadDetail.comments[0].replies[1].username).toEqual('ryananggada');
     expect(threadDetail.comments[0].replies[1].content).toEqual(
-      'Reply goes here again',
+      '**balasan telah dihapus**',
     );
 
     expect(threadDetail.comments[1].replies).toHaveLength(0);
@@ -158,12 +130,6 @@ describe('GetThreadDetailUseCase', () => {
     const mockReplyRepository = new ReplyRepository();
     const mockUserRepository = new UserRepository();
 
-    const mockUserData = {
-      id: 'user-123',
-      username: 'johncena',
-      fullname: 'John Cena',
-    };
-
     const mockThreadData = {
       id: 'thread-123',
       title: 'My thread',
@@ -172,9 +138,6 @@ describe('GetThreadDetailUseCase', () => {
       username: 'johncena',
     };
 
-    mockUserRepository.getUserById = jest
-      .fn()
-      .mockImplementation(() => Promise.resolve(mockUserData));
     mockThreadRepository.getThreadById = jest
       .fn()
       .mockImplementation(() => Promise.resolve(mockThreadData));
