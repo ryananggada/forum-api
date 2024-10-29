@@ -8,11 +8,13 @@ class GetThreadDetailUseCase {
     userRepository,
     commentRepository,
     replyRepository,
+    likeRepository,
   }) {
     this._threadRepository = threadRepository;
     this._userRepository = userRepository;
     this._commentRepository = commentRepository;
     this._replyRepository = replyRepository;
+    this._likeRepository = likeRepository;
   }
 
   async execute(threadId) {
@@ -31,6 +33,12 @@ class GetThreadDetailUseCase {
       await this._commentRepository.getCommentsByThreadId(threadId);
 
     if (commentsInThread.length > 0) {
+      const likesResult = await this._likeRepository.getLikesByThreadId(
+        threadId,
+      );
+      const likeCount = (commentId) =>
+        likesResult.filter((like) => like.comment_id === commentId).length;
+
       const commentDetails = await Promise.all(
         commentsInThread.map(async (comment) => {
           const commentDetail = new CommentDetail({
@@ -38,6 +46,7 @@ class GetThreadDetailUseCase {
             username: comment.username,
             date: comment.created_at.toString(),
             content: comment.content,
+            likeCount: likeCount(comment.id),
             replies: [],
             isDelete: comment.is_delete,
           });
