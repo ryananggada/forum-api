@@ -7,7 +7,6 @@ describe('CommentDetail entities', () => {
       date: '2022-09-09T09:15:30.338Z',
       content: 'Nice article!',
       replies: [],
-      likeCount: 0,
     };
 
     expect(() => new CommentDetail(payload)).toThrow(
@@ -21,7 +20,6 @@ describe('CommentDetail entities', () => {
       username: 'user-456',
       date: '2022-09-09T09:15:30.338Z',
       content: 123,
-      likeCount: 0,
       replies: [],
     };
 
@@ -37,18 +35,15 @@ describe('CommentDetail entities', () => {
       date: '2022-09-09T09:15:30.338Z',
       content: 'Nice article!',
       replies: [],
-      likeCount: 0,
       isDelete: false,
     };
 
-    const { id, username, date, content, likeCount, replies } =
-      new CommentDetail(payload);
+    const { id, username, date, content, replies } = new CommentDetail(payload);
 
     expect(id).toEqual(payload.id);
     expect(username).toEqual(payload.username);
     expect(date).toEqual(payload.date);
     expect(content).toEqual(payload.content);
-    expect(likeCount).toEqual(payload.likeCount);
     expect(replies).toEqual(payload.replies);
   });
 
@@ -59,18 +54,15 @@ describe('CommentDetail entities', () => {
       date: '2022-09-09T09:15:30.338Z',
       content: 'Nice article!',
       replies: [],
-      likeCount: 0,
       isDelete: true,
     };
 
-    const { id, username, date, content, likeCount, replies } =
-      new CommentDetail(payload);
+    const { id, username, date, content, replies } = new CommentDetail(payload);
 
     expect(id).toEqual(payload.id);
     expect(username).toEqual(payload.username);
     expect(date).toEqual(payload.date);
     expect(content).toEqual('**komentar telah dihapus**');
-    expect(likeCount).toEqual(0);
     expect(replies).toEqual(payload.replies);
   });
 });

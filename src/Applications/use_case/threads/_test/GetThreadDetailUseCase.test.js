@@ -2,7 +2,6 @@ const ThreadRepository = require('../../../../Domains/threads/ThreadRepository')
 const CommentRepository = require('../../../../Domains/comments/CommentRepository');
 const ReplyRepository = require('../../../../Domains/replies/ReplyRepository');
 const UserRepository = require('../../../../Domains/users/UserRepository');
-const LikeRepository = require('../../../../Domains/likes/LikeRepository');
 const GetThreadDetailUseCase = require('../GetThreadDetailUseCase');
 
 describe('GetThreadDetailUseCase', () => {
@@ -11,7 +10,6 @@ describe('GetThreadDetailUseCase', () => {
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
     const mockUserRepository = new UserRepository();
-    const mockLikeRepository = new LikeRepository();
 
     const mockThreadData = {
       id: 'thread-123',
@@ -62,9 +60,6 @@ describe('GetThreadDetailUseCase', () => {
     mockThreadRepository.getThreadById = jest
       .fn()
       .mockImplementation(() => Promise.resolve(mockThreadData));
-    mockLikeRepository.getLikesByThreadId = jest
-      .fn()
-      .mockImplementation(() => Promise.resolve([]));
     mockCommentRepository.getCommentsByThreadId = jest
       .fn()
       .mockImplementation(() => Promise.resolve(mockCommentData));
@@ -83,13 +78,11 @@ describe('GetThreadDetailUseCase', () => {
       userRepository: mockUserRepository,
       commentRepository: mockCommentRepository,
       replyRepository: mockReplyRepository,
-      likeRepository: mockLikeRepository,
     });
 
     const threadDetail = await getThreadDetailUseCase.execute('thread-123');
 
     expect(mockThreadRepository.getThreadById).toBeCalledWith('thread-123');
-    expect(mockLikeRepository.getLikesByThreadId).toBeCalledWith('thread-123');
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(
       'thread-123',
     );
@@ -136,7 +129,6 @@ describe('GetThreadDetailUseCase', () => {
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
     const mockUserRepository = new UserRepository();
-    const mockLikeRepository = new LikeRepository();
 
     const mockThreadData = {
       id: 'thread-123',
@@ -161,7 +153,6 @@ describe('GetThreadDetailUseCase', () => {
       userRepository: mockUserRepository,
       commentRepository: mockCommentRepository,
       replyRepository: mockReplyRepository,
-      likeRepository: mockLikeRepository,
     });
 
     const threadDetail = await getThreadDetailUseCase.execute('thread-123');
