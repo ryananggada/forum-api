@@ -87,7 +87,7 @@ describe('LikeCommentUseCase', () => {
       .mockImplementation(() => Promise.resolve(mockComment.id));
     mockLikeRepository.getHasLiked = jest
       .fn()
-      .mockImplementation(() => Promise.resolve(['like-123']));
+      .mockImplementation(() => Promise.resolve([{ id: 'like-123' }]));
     mockLikeRepository.deleteLikeById = jest
       .fn()
       .mockImplementation(() => Promise.resolve({ status: 'success' }));

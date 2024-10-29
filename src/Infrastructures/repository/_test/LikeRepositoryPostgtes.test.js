@@ -71,9 +71,11 @@ describe('LikeRepositoryPostgres', () => {
       });
 
       const likeRepositoryPostgres = new LikeRepositoryPostgres(pool, {});
-      const response = likeRepositoryPostgres.deleteLikeById('like-123');
 
-      expect(response).resolves.toBeDefined();
+      await likeRepositoryPostgres.deleteLikeById('like-123');
+      const like = await LikesTableTestHelper.findLikesById('like-123');
+
+      expect(like).toHaveLength(0);
     });
   });
 

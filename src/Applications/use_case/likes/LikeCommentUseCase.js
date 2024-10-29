@@ -9,7 +9,7 @@ class LikeCommentUseCase {
     await this._threadRepository.verifyThreadAvailability(threadId);
     await this._commentRepository.checkAvailabilityComment(commentId);
 
-    const hasLiked = this._likeRepository.getHasLiked(
+    const hasLiked = await this._likeRepository.getHasLiked(
       userId,
       threadId,
       commentId,

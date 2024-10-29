@@ -95,5 +95,72 @@ describe('/threads/{threadId}/comments/{commentId}/likes endpoint', () => {
       expect(response.statusCode).toEqual(200);
       expect(responseJson.status).toEqual('success');
     });
+
+    it('should reponse 200 and persist unlike comment', async () => {
+      const loginPayload = {
+        username: 'ryananggada',
+        password: 'password123',
+      };
+      const threadPayload = {
+        title: 'My title',
+        body: 'The body of thread',
+      };
+      const commentPayload = {
+        content: 'My comment',
+      };
+
+      const server = await createServer(container);
+      await server.inject({
+        method: 'POST',
+        url: '/users',
+        payload: {
+          username: loginPayload.username,
+          password: loginPayload.password,
+          fullname: 'Ryan Anggada',
+        },
+      });
+
+      const auth = await server.inject({
+        method: 'POST',
+        url: '/authentications',
+        payload: loginPayload,
+      });
+      const authResponse = JSON.parse(auth.payload);
+      const authToken = authResponse.data.accessToken;
+
+      const thread = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        payload: threadPayload,
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      const threadResponse = JSON.parse(thread.payload);
+      const threadId = threadResponse.data.addedThread.id;
+
+      const comment = await server.inject({
+        method: 'POST',
+        url: `/threads/${threadId}/comments`,
+        payload: commentPayload,
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      const commentResponse = JSON.parse(comment.payload);
+      const commentId = commentResponse.data.addedComment.id;
+
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}/comments/${commentId}/likes`,
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+
+      const response2 = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}/comments/${commentId}/likes`,
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      const response2Json = JSON.parse(response.payload);
+
+      expect(response2.statusCode).toEqual(200);
+      expect(response2Json.status).toEqual('success');
+    });
   });
 });
